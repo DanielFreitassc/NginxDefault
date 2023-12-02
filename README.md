@@ -1,5 +1,3 @@
-**Resumo das Anotações do Spring Boot em Português:**
-
 ### Anotações Gerais do Spring Boot:
 
 1. **@SpringBootApplication:**
