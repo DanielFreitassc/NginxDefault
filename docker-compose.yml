@@ -1,8 +1,41 @@
 services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=db
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_IDLE_IN_TRANSACTION_SESSION_TIMEOUT=60000
+      - POSTGRES_TCP_KEEPALIVES_IDLE=8
+      - POSTGRES_TCP_KEEPALIVES_INTERVAL=8
+      - POSTGRES_TCP_KEEPALIVES_COUNT=8
+    ports:
+      - 5432:5432
+    networks:
+      - public_network
+    volumes:
+      - data:/var/lib/postgresql/data
+    restart: always
+
+  spring:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spring
+    ports:
+      - 8080:8080
+    networks:
+      - public_network
+    depends_on:
+      - postgres
+
   nginx:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
+    container_name: nginx
     ports:
       - "80:80"
       - "443:443"
@@ -11,3 +44,13 @@ services:
       - ./cert:/cert
     environment:
       - NODE_ENV=production
+    networks:
+      - public_network
+    depends_on:
+      - spring
+
+volumes:
+  data:
+
+networks:
+  public_network:
